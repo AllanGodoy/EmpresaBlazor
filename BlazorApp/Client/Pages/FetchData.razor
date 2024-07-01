@@ -1,0 +1,61 @@
+﻿@page "/fetchdata"
+@using BlazorApp.Shared
+@using BlazorApp.Shared.Models;
+
+
+@inject HttpClient Http
+
+<PageTitle>Weather forecast</PageTitle>
+
+<h1>Weather forecast</h1>
+
+<p>This component demonstrates fetching data from the server.</p>
+
+@if (lista == null)
+{
+    <p><em>Loading...</em></p>
+}
+else
+{
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Date</th>
+                <th>Temp. (C)</th>
+                <th>Temp. (F)</th>
+                <th>Summary</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var l in lista)
+            {
+                <tr>
+                    <td>@l.Nombres</td>
+                    <td>@l.Apellidos</td>
+                    <td>@l.Direccion</td>
+                    <td>@l.Telefono</td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}
+
+@code {
+    private List<Empleado> lista;
+
+    protected override async Task OnInitializedAsync()
+    {
+        lista = await Http.GetFromJsonAsync<List<Empleado>>("api/Empleado");
+    }
+
+
+    /// <summary>
+    /// /
+    /// </summary>
+    // private WeatherForecast[]? forecasts;
+
+    // protected override async Task OnInitializedAsync()
+    // {
+    //     forecasts = await Http.GetFromJsonAsync<WeatherForecast[]>("WeatherForecast");
+    // }
+}

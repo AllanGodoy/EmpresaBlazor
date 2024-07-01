@@ -1,0 +1,54 @@
+﻿@page "/Empleado/Borrar/{Id:int}"
+@using BlazorApp.Shared;
+@using BlazorApp.Shared.Models;
+@inject HttpClient Http;
+@inject NavigationManager NavigationManager;
+
+<h2>Borrar Empleado</h2>
+<br />
+<div class="form-group">
+    <h4>¿Quieres borrar este Empleado?</h4>
+    <table class="table"> 
+        <tbody>
+            <tr>
+                <td align="right">Nombre: </td>
+                <td>@empleado.Nombres</td>
+            </tr>
+                 <tr>
+                <td align="right">Apellido : </td>
+                <td>@empleado.Apellidos</td>
+            </tr>
+            <tr>
+                <td align="right">Nombre : </td>
+                <td>@empleado.Telefono</td>
+            </tr>
+        </tbody>
+    </table>
+</div>
+<div class="form-group">
+    <input type="submit" value="Borrar" @onclick="(async () => await Borrar(empleado.Id))" class="btn btn-danger"/>
+    <input type="submit" value="Cancelar" @onclick="(async () => Cancelar())" class="btn btn-warning" />
+
+</div>
+
+@code {
+    [Parameter]
+    public int Id {get; set;}
+    Empleado empleado = new Empleado();
+
+    protected override async Task OnInitializedAsync()    
+    {
+        empleado = await Http.GetFromJsonAsync<Empleado>("api/Empleado/" + Id.ToString());
+    }
+
+    protected async Task Borrar(int Id)
+    {
+        await Http.DeleteAsync("api/Empleado/"+Id);
+        NavigationManager.NavigateTo("/");
+    }
+
+    void Cancelar()
+    {        
+        NavigationManager.NavigateTo("/");    
+    }
+}

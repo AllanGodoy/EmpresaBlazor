@@ -1,0 +1,96 @@
+﻿@page "/"
+
+@using BlazorApp.Shared.Models
+@inject HttpClient Http
+
+<h1>Lista de Empleados</h1>
+<div class="row">
+    <div class="col-md-6">
+        <a href="/Empleado/Nuevo" class="btn btn-primary" role="button">
+        <i clas="fas fa-user-lus">Nuevo Usuario</i>
+        </a>
+    </div>
+   
+    <div class="input-group-append " style="padding-top:25px">
+        <div class="colum">
+            <input type="text" class="from-control" placeholder="Buscar Por Nombre"
+                   @bind="cadenaBusqueda" @bind:event="oninput" @onkeyup="FiltroBusqueda" />
+            @if (cadenaBusqueda.Length > 0)
+            {
+           @*  <div class="input-group-append"> *@
+                <button class="btn btn-danger" @onclick="LimpiarBusqueda" >
+                    <i class="fas fa-times"> Limpiar</i>
+
+                </button>
+            @* </div> *@
+            }
+
+        </div>
+    </div> 
+</div>
+
+@if (lista == null)
+{
+    <p><em>Loading...</em></p>
+}
+else
+{
+    <table class="table table-striped align-midle table-bordered">
+        <thead class="table-success">
+            <tr>
+                <th>Nombre</th>
+                <th>Apellidos</th>
+                <th>Direccion</th>
+                <th>Telefono</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var l in lista)
+            {
+                <tr>
+                    <td>@l.Nombres</td>
+                    <td>@l.Apellidos</td>
+                    <td>@l.Direccion</td>
+                    <td>@l.Telefono</td>
+                    
+                    <td>
+                        <a href="/Empleado/Editar/@l.Id " class="btn btn-secondary" role="button">Editar</a>
+                        <a href="/Empleado/Borrar/@l.Id " class="btn btn-danger" role="button">Borrar</a>
+                    </td>
+                </tr>
+
+            }
+        </tbody>
+    </table>
+}
+
+
+@code {
+
+    private List<Empleado> lista;
+    private List<Empleado> listaAux;
+    string cadenaBusqueda = string.Empty;
+
+    protected override async Task OnInitializedAsync()
+    {
+        lista = await Http.GetFromJsonAsync<List<Empleado>>("api/Empleado");
+        listaAux = lista;
+    }     
+
+    protected void FiltroBusqueda()
+    {
+        if (!string.IsNullOrEmpty(cadenaBusqueda))
+        {           
+            lista = lista.Where(x => x.Nombres.IndexOf(cadenaBusqueda, StringComparison.OrdinalIgnoreCase) != -1).ToList();
+        }
+        else{         
+            lista = listaAux;
+        }
+    }
+
+    protected void LimpiarBusqueda()
+    {
+        cadenaBusqueda = string.Empty;
+        lista = listaAux;
+    }
+}

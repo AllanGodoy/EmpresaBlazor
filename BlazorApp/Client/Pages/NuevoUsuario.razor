@@ -1,0 +1,84 @@
+﻿@page "/Empleado/Nuevo"
+@page "/Empleado/Editar/{Id:int}"
+@using BlazorApp.Shared;
+@using BlazorApp.Shared.Models;
+@inject HttpClient Http;
+@inject NavigationManager NavigationManager;
+
+<h1>@Titulo Empleado</h1>
+
+<EditForm Model="@empleado" OnValidSubmit="GuardarUsuario">
+    <DataAnnotationsValidator />
+        <div class="mb-3">
+            <label for="Nombre" class="form-label">Nombre</label>
+            <div class="col-md-4">
+                <InputText class="form-control" @bind-Value="empleado.Nombres" />
+            </div>
+            <ValidationMessage For="@(() => empleado.Nombres)" />
+        </div>
+
+        <div class="mb-3">
+            <label for="Apellidos" class="form-label">Apellidos</label>
+            <div class="col-md-4">
+                <InputText class="form-control" @bind-Value="empleado.Apellidos" />
+            </div>
+            <ValidationMessage For="@(() => empleado.Apellidos)" />
+        </div>
+
+        <div class="mb-3">
+            <label for="Telefono" class="form-label">Telefono</label>
+            <div class="col-md-4">
+                <InputText class="form-control" @bind-Value="empleado.Telefono" />
+            </div>
+            <ValidationMessage For="@(() => empleado.Apellidos)" />
+        </div>
+        
+         <div class="form-group">
+             <button type="submit" class="btn btn-primary">Guardar</button>
+        <button class="btn btn-light" @onclick="(async () => Cancelar())">Cancelar</button>
+         </div>
+
+   
+
+
+</EditForm>
+
+
+@code {
+    [Parameter]
+    public int Id { get; set; }
+    protected string Titulo = "Nuevo";
+    protected Empleado empleado = new();
+
+
+     protected override async Task OnParametersSetAsync()
+    // protected override async Task OnInitializedAsync()
+    {
+        if (Id != 0)
+        {
+            Titulo = "Editar";
+            empleado = await Http.GetFromJsonAsync<Empleado>("api/Empleado/" + Id.ToString());
+        }
+
+    }
+
+    protected async Task GuardarUsuario()
+    {
+        if (empleado.Id != 0)
+        {
+
+            await Http.PutAsJsonAsync("api/Empleado", empleado);
+        }
+        else
+        {
+            await Http.PostAsJsonAsync("api/Empleado", empleado);
+        }
+        Cancelar();
+    }
+
+    public void Cancelar()
+    {
+        NavigationManager.NavigateTo("/");
+    }
+
+}
